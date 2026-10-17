@@ -96,15 +96,17 @@ PanelWindow {
         cacheFile.setText(state)
     }
 
-    // pid-guarded: with an empty pid, /proc//stat collapses to /proc/stat (a
-    // multi-line file) and awk would inject raw newlines into the token → broken
-    // JSON. So build the token ONLY when mako's pid is known; else token="" (the
-    // merge then keeps the current generation untouched — a safe no-op).
-    readonly property string pollScript: "pid=$(pidof mako 2>/dev/null | awk '{print $1}'); if [ -n \"$pid\" ]; then bid=$(cat /proc/sys/kernel/random/boot_id 2>/dev/null); st=$(awk '{print $22}' /proc/$pid/stat 2>/dev/null); tok=\"$bid-$pid-$st\"; else tok=\"\"; fi; lst=$(makoctl list -j 2>/dev/null); [ -z \"$lst\" ] && lst='[]'; his=$(makoctl history -j 2>/dev/null); [ -z \"$his\" ] && his='[]'; printf '{\"token\":\"%s\",\"list\":%s,\"history\":%s}' \"$tok\" \"$lst\" \"$his\""
+    // Mako when it is the daemon. Omarchy 4 keeps the toasts in
+    // ~/.local/state/omarchy/notifications/ and does not run mako.
+    readonly property string omarchyPollScript: {
+        var path = String(Qt.resolvedUrl("omarchy-notifications.sh"))
+        if (path.indexOf("file://") === 0) path = decodeURIComponent(path.substring(7))
+        return path
+    }
 
     Process {
         id: pollProc
-        command: ["bash", "-c", notifPanel.pollScript]
+        command: ["bash", notifPanel.omarchyPollScript]
         running: false
         stdout: StdioCollector {
             onStreamFinished: {

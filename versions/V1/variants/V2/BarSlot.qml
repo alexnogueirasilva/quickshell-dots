@@ -1190,6 +1190,7 @@ PanelWindow {
                 IdleInhibitorWidget { root: barSlot.root; anchors.verticalCenter: parent.verticalCenter }
                 MediaBrowserWidget  { root: barSlot.root; screen: barSlot.screen; anchors.verticalCenter: parent.verticalCenter }
                 ThemeDisplayWidget  { root: barSlot.root; screen: barSlot.screen; anchors.verticalCenter: parent.verticalCenter }
+                LegacyPlugins       { root: barSlot.root; iconSpacing: barSlot.root.v2IconClusterSpacing; anchors.verticalCenter: parent.verticalCenter }
             }
         }
     }
